@@ -15,6 +15,8 @@ private:
     QList<QList<int> > sperms;
     int _N = 0;
     QList<int> _sPermPool;
+    QList<int> _sPermSigns;
+    bool _sPermity = true;
 
 public:
     void setSpermSize(int N);
@@ -22,6 +24,9 @@ public:
     void sPermSwap(int a, int b);
     void sPermute(int k, int size);
     void appendSPerm(int size);
+
+
+
 
 signals:
 

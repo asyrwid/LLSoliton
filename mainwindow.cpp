@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _sPermutator.setSpermSize(5);
     _sPermutator.sPermute(4,4);
 
+
 }
 
 MainWindow::~MainWindow()

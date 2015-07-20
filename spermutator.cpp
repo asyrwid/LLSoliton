@@ -22,17 +22,26 @@ int sPermutator::getSpermSize()
 
 void sPermutator::sPermSwap(int a, int b)
 {
+    if (a == b)
+    {
+     return;
+    }
+
     _sPermPool.swap(a,b);
+
+    _sPermity = !_sPermity;
 }
 
 void sPermutator::appendSPerm(int size)
 {
     sperms.append(_sPermPool.mid(0, size));
-//    for(int i = 0; i<size; i++)
-//    {
-//        sperms[j].append( _sPermPool[i]);
-//    }
-    qDebug() << sperms.last();
+    if (_sPermity == true){
+        _sPermSigns.append(1);
+    }
+    else{
+        _sPermSigns.append(-1);
+    }
+    qDebug() << sperms.last() << ' ' << _sPermSigns.last();
 }
 
 void sPermutator::sPermute(int k, int size)
