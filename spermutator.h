@@ -30,8 +30,9 @@ public:
     std::complex<double> WaveFunction(int n, double c, QList<double> X, QList<double> K);
     double GetRandom(double min, double max);
     QList<double> ParticlePositions;
-    QList<double> Positions(QList<double> X0, QList<double> X1, double delta, int n, double L);
-    QList<QList<double> > Metropolis(int ChainLength, int n, double L);
+    void Positions(QList<double> X0, QList<double> &X1, double delta, int n, double L);
+    void AddCollection(QList<QList<double> > &Chain, QList<double>  Set);
+    void Metropolis(int N,double c, QList<QList<double> > &Chain, QList<double>  &X0, QList<double>  &X1, QList<double>  K, double delta, int n, double L);
 
 signals:
 

@@ -165,8 +165,9 @@ std::complex<double> sPermutator::WaveFunction(int n, double c, QList<double> X,
     Complex Norm( 1/(sqrt(norm)),0 ) ;
     wavefunction = Norm * wavefunction;
 
-    qDebug() << wavefunction.real() << ',' << wavefunction.imag();
-    qDebug() << (wavefunction.real())*(wavefunction.real()) + ( wavefunction.imag())*( wavefunction.imag()) ;
+    //qDebug() << wavefunction.real() << ',' << wavefunction.imag();
+
+    wavefunction = (wavefunction.real())*(wavefunction.real()) + ( wavefunction.imag())*( wavefunction.imag()) ;
     return wavefunction;
 }
 
@@ -181,18 +182,72 @@ double sPermutator::GetRandom(double min, double max)
 {// Returns a random double between min and max
     return ((double) rand()*(max-min)/(double)RAND_MAX + min);
 }
-QList<double> sPermutator::Positions(QList<double> X0, QList<double> X1, double delta, int n, double L)
-{// List of n randomly choosen positions
+void sPermutator::Positions(QList<double> X0, QList<double> &X1, double delta, int n, double L)
+{// one step in Metropolis x1(n)->x1'(n) = x0(n)+ delta*Q, Qin [-L,L]
     double posX;
-
         posX = delta * GetRandom(-L, L);
-        X1[n] = X0.at(n) + posX;
-    qDebug() << X1;
-    return X1;
+        if( X0.at(n) + posX < 0 ){
+        X1[n] = L + ( X0.at(n) + posX);
+        }
+        else
+        {
+            if( X0.at(n) + posX > L )
+            {
+            X1[n] =  X0.at(n) + posX - L;
+            }
+            else
+            {
+            X1[n] =  X0.at(n) + posX;
+            }
+        }
 
+    //qDebug() << X1;
 }
 
-//QList<QList<double> > sPermutator::Metropolis(int ChainLength, int n, double L)
+
+void sPermutator::AddCollection(QList<QList<double> > &Chain, QList<double>  Set)
+{
+    Chain.append( Set.mid(0, Set.size() ) );
+    qDebug() << Chain;
+}
+
+void sPermutator::Metropolis(int N,double c, QList<QList<double> > &Chain,  QList<double>  &X0,QList<double>  &X1, QList<double>  K, double delta, int n, double L)
+{
+
+    double ratio;
+    double dif;
+    double random0to1;
+
+    for(int i = 0; i < n; i++)
+    {
+        Positions(X0, X1, delta, i, L);
+        ratio = (WaveFunction(N,c, X1, K).real())/(WaveFunction(N, c, X0, K).real());
+        if( ratio >= 1 )
+        {}  else
+            {
+            random0to1 = GetRandom(0,1);
+            dif = ratio - random0to1;
+                if( dif < 0 )
+                {
+                }
+                else
+                {
+                    X1[i] =  X0.at(i);
+                }
+            }
+     X0 = X1;
+    }
+
+    AddCollection(Chain, X0);
+}
+
+
+
+
+
+
+
+
 
 
 
