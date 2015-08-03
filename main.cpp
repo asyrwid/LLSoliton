@@ -139,18 +139,12 @@ permutator _Permutator;
 //***********************************************************************************************************
 
     cout << "\n"  << "\n"  << "\n"  ;
-    _Permutator.PhaseJump(Jumps, 10, N, 10,1.0 ,c,L,Chain,K);
+    _Permutator.PhaseJump(Jumps, 10, N, 2,1.0 ,c,L,Chain,K);
     cout << "\n"  << "\n"  << "\n"  ;
     for(unsigned i = 0; i < Jumps.size(); i++)
     {
     cout << Jumps.at(i) << "\n"  ;
     }
-
-
-
-
-
-
 
 
 }
