@@ -19,7 +19,7 @@ int main()
 /* ************** INITIAL VALUES ************** */
 //***********************************************************************************************************
 
-    int    Steps = 200; // number of metropolis steps
+    int    Steps = 80; // number of metropolis steps
     int N = 8; // number of particles
     double c = 0.08; // coupling constant
     double L = 1; // system length

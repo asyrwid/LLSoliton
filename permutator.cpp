@@ -235,8 +235,8 @@ void permutator::Metropolis(int N,double c, vector<vector<double> > &Chain, vect
     {
         Positions(X0, X1, delta, i, L);
     }
-        wf0 =  pow (abs(WaveFunction(N,c, X0, K) ), 2.);
-        wf1 =  pow (abs(WaveFunction(N,c, X1, K) ), 2.);
+        wf0 =  pow (fabs(WaveFunction(N,c, X0, K) ), 2.);
+        wf1 =  pow (fabs(WaveFunction(N,c, X1, K) ), 2.);
 
         ratio = wf1/wf0;
 
@@ -303,20 +303,20 @@ vector<double> permutator::PhaseCalculation(std::complex<double> WF)
             Phase = atan( WF_im/WF_re );
         }
         else{// means WF_re > 0, WF_im <0
-            Phase = PI_Value - atan( abs( WF_im/WF_re ) );
+            Phase = PI_Value - atan( fabs( WF_im/WF_re ) );
         }
     }
     else{// means WF_re < 0
         if( WF_im > 0 )
         {
-            Phase = 2.*PI_Value - atan( abs( WF_im/WF_re ) );
+            Phase = 2.*PI_Value - atan( fabs( WF_im/WF_re ) );
         }
         else{// means WF_re < 0, WF_im < 0
-            Phase = PI_Value + atan( abs( WF_im/WF_re ) );
+            Phase = PI_Value + atan( fabs( WF_im/WF_re ) );
         }
     }
 
-    Out.push_back( abs(WF) );
+    Out.push_back( fabs(WF) );
     Out.push_back( Phase );
 
     return Out;
@@ -355,7 +355,12 @@ void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, in
 
     for(int i = 0; i < InitialDivision-1; i++)
     {
-        diff = sqrt( pow ( PhaseValues.at(i+1) - PhaseValues.at(i), 2) );
+        auto phase_a = PhaseValues.at(i+1);
+        auto phase_b = PhaseValues.at(i);
+        diff = sqrt( pow ( phase_a - phase_b, 2) );
+        cout << "diff: " << diff << __func__ << std::endl;
+        cout << "phase at i+1 : " << phase_a << std::endl;
+        cout << "phase at i : " << phase_b << std::endl;
         JumpValue.push_back( diff );
 
         if( diff >= JumpRestriction)
