@@ -94,7 +94,7 @@ std::complex<double> sPermutator::sProduct(int n, int PermNumber, double c, QLis
     //Product (j>k which appears in the wave function) definition
     //PermNumber is the number of permutation in permutations array (row)
     Complex  prod(1.,0.);
-    for (int j = 0; j < n ; j++)
+    for (int j = 0; j < n  ; j++)
     {
         for (int k = 0; k < j; k++)
         {
@@ -146,12 +146,20 @@ std::complex<double> sPermutator::WaveFunction(int n, double c, QList<double> X,
             //qDebug() << Nfact;
     // Actually, it is the number of rows of "perms"
     // ********r****************************************************************
-    Complex wavefunction(0.,0.);
-    for(int i = 0; i < Nfact; i++)
+    double re=0,im=0;
+    int i;
+    #pragma omp parallel  private(i) reduction(+:re) reduction(+:im)
     {
-    wavefunction = wavefunction + sProduct(n, i, c, X, K);
-    //qDebug() << wavefunction.real() << ',' << wavefunction.imag();
+        Complex wavefunction(0.,0.);
+        #pragma omp for
+        for(i = 0; i < Nfact; i++)
+        {
+            wavefunction = wavefunction + sProduct(n, i, c, X, K);
+        }
+        re=wavefunction.real();
+        im=wavefunction.imag();
     }
+    Complex wavefunction(re,im);
     //Normalization factor
 
     double norm = Nfact;
@@ -208,37 +216,47 @@ void sPermutator::Positions(QList<double> X0, QList<double> &X1, double delta, i
 void sPermutator::AddCollection(QList<QList<double> > &Chain, QList<double>  Set)
 {
     Chain.append( Set.mid(0, Set.size() ) );
-    qDebug() << Chain;
+    //qDebug() << Chain;
 }
 
-void sPermutator::Metropolis(int N,double c, QList<QList<double> > &Chain,  QList<double>  &X0,QList<double>  &X1, QList<double>  K, double delta, int n, double L)
+void sPermutator::Metropolis(int N,double c, QList<QList<double> > &Chain, QList<double> &WaveFValues,  QList<double>  &X0,QList<double>  &X1, QList<double>  K, double delta, int n, double L)
 {
-
     double ratio;
     double dif;
     double random0to1;
+    double wf0;
+    double wf1;
 
     for(int i = 0; i < n; i++)
     {
         Positions(X0, X1, delta, i, L);
-        ratio = (WaveFunction(N,c, X1, K).real())/(WaveFunction(N, c, X0, K).real());
+    }
+        wf0 =  WaveFunction(N,c, X0, K).real();
+        wf1 =  WaveFunction(N,c, X1, K).real();
+
+        ratio = wf1/wf0;
+
         if( ratio >= 1 )
-        {}  else
-            {
+        {
+            WaveFValues.append(wf1);
+            AddCollection(Chain,X1);
+        }
+        else
+        {
             random0to1 = GetRandom(0,1);
             dif = ratio - random0to1;
-                if( dif < 0 )
+                if( dif > 0 )
                 {
+                    WaveFValues.append(wf1);
+                    AddCollection(Chain,X0);
                 }
                 else
                 {
-                    X1[i] =  X0.at(i);
+                    X1 = X0;
                 }
-            }
+        }
      X0 = X1;
-    }
 
-    AddCollection(Chain, X0);
 }
 
 

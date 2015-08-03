@@ -3,30 +3,52 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include <QTableWidget>
+#include <QElapsedTimer>
+#include <iostream>
+#include <fstream>
+/* srand example */
+#include <stdio.h>      /* printf, NULL */
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
+#include <omp.h>       /* OpenMP */
+
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
+    QElapsedTimer timer;
+    timer.start();
+
+
+    srand (time(NULL));
+    qDebug() << "First number: %d\n" << rand()%100;
 // initial values!
 //*************************************************************************
 //*************************************************************************
 
-    int    N = 9; // number of particles
-    double c = 1; // coupling constant
+
+    int    N = 8; // number of particles
+    double c = 24.; // coupling constant
     double L = 1; // system length
-    double delta = 0.2; // maximal "jump" between single particle
+    double delta = 0.3; // maximal "jump" between single particle
                         // position from one realization to another
 
     // initial collection of particle positions
-    QList<double> X0 = {.1,.3,.5,.6,.1,.4,.3,.2,.4};
+    QList<double> X0 = {.1,.12,.13,.122,.132,.111,.113,.118};
     QList<double> X1 = X0;
 
     // quasimomentas
-    QList<double> K = {-10.3,-2.24633, -0.714948, 0.714948, 2.24633,3.4,-1.2,2.6,6.1};
+    QList<double> K = {-0.752974,-0.30724,0.107856,0.552964,5.73022,6.17533,6.59043,7.03616};
 
     // chain of position
     QList<QList<double> > Chain;
+
+    //chain of wave function values
+    QList<double> WaveFValues;
 
 
 //*************************************************************************
@@ -48,25 +70,49 @@ MainWindow::MainWindow(QWidget *parent) :
     //_sPermutator.AddCollection(Chain, X1);
     _sPermutator.AddCollection(Chain, X0);
     qDebug() << Chain;
-    for(int i = 1; i < N; i++)
+    for(int i = 0; i < 10000; i++)
     {
-    _sPermutator.Metropolis(N,c,Chain,X0,X1,K,delta,N,L);
-    qDebug() << X0 << i;
+    _sPermutator.Metropolis(N,c,Chain,WaveFValues,X0,X1,K,delta,N,L);
+    qDebug() << i;
+    //qDebug() << WaveFValues;
     }
+    for(int i = 0; i < Chain.size(); i++)
+    {
+    qDebug() << Chain.at(i);
+    }
+
+    qDebug() << Chain ;
+
+
+
+
+    std::ofstream create ("test.txt");
+    std::fstream fs;
+    fs.open ("test.txt");
+    for(int i = 0; i < Chain.size(); i++)
+    {
+        for(int j = 0; j < N; j++ )
+        {
+            fs << (Chain.at(i)).at(j) << " ";
+        }
+        fs << "\n";
+    }
+    fs.close();
+
 
     ui->tableWidget->setRowCount(Chain.size());
     ui->tableWidget->setColumnCount(N);
 
-    for(int i = 0; i < N; i++)
+    for(int i = 0; i < Chain.size(); i++)
     {
         for(int j = 0; j < N; j++)
         {
-        double r = 255.*(Chain.at(i)).at(j);
+        double r = 16.*(Chain.at(i)).at(j);
         ui->tableWidget->setItem(i, j, new QTableWidgetItem);
-        ui->tableWidget->item(i, j)->setBackground(QBrush(QColor(r ,255 - r ,r)));
+        ui->tableWidget->item(i, j)->setBackground(QBrush(QColor(0  ,255 - r*r ,r*r)));
         }
     }
-
+qDebug() << (timer.elapsed())/1000.;
 
 }
 
