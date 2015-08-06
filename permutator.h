@@ -39,7 +39,7 @@ public:
     void Metropolis(int N,double c, vector<vector<double> > &Chain,  vector<double> &WaveFValues, vector<double>  &X0, vector<double>  &X1, vector<double>  K, double delta, int n, double L);
     int  MaximumPosition(vector<double> WaveFValues);
     vector<double> PhaseCalculation(std::complex<double> WF);
-    void PhaseJump(vector<double> &Jumps, int InitialDivision, int n, int ChainElement, double JumpRestriction, double c, double L, vector<vector<double> > Chain, vector<double> K);
+    void MinimaFinder(vector<double> &Minima, vector<vector<double>> &PhaseMatrix, vector<vector<double>> &WFMatrix, int NumOfBisections, int InitialDivision, int n, int ChainElement, double JumpRestriction, double c, double L, vector<vector<double> > Chain, vector<double> K);
 
 //signals:
 

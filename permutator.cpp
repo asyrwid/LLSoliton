@@ -18,7 +18,7 @@ void permutator::setPermSize(int N) //particle number setting
 }
 
 int permutator::getPermSize() //expectorate (wykrztuś,wypluj)
-{                               //the particle number
+{                             //the particle number
     return _N;
 }
 
@@ -83,16 +83,20 @@ int permutator::SignFunction(double x1, double x2) // sign function
 }
 
 
-//*******************************************************************************************************************
-//*******************************************************************************************************************
-//WAVE FUNCTION PREPARATION
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+//*********************************** WAVE FUNCTION PREPARATION **********************************************************************
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
 typedef std::complex<double> Complex;
 
 std::complex<double> permutator::sProduct(int n, int PermNumber, double c, vector<double> X, vector<double> K)
-{   // 1.
-    //Product (j>k which appears in the wave function) definition
-    //PermNumber is the number of permutation in permutations array (row)
+{
+// ====================================================================================================================================
+// 1) Product (j>k which appears in the wave function) definition. PermNumber is the number of permutation in permutations array (row)
+// ====================================================================================================================================
+
     Complex  prod(1.,0.);
     for (int j = 0; j < n; j++)
     {
@@ -104,8 +108,11 @@ std::complex<double> permutator::sProduct(int n, int PermNumber, double c, vecto
     }
     // cout << prod.real() << ',' << prod.imag();
 
-    //2.
-    //Exponent with a sum over X[]K[]
+
+// ====================================================================================================================================
+// 2) Exponent with a sum over X[]K[]
+// ====================================================================================================================================
+
     double sumexp = 0.;
     for(int j = 0; j < n; j++)
     {
@@ -116,15 +123,20 @@ std::complex<double> permutator::sProduct(int n, int PermNumber, double c, vecto
     ImExp = exp(ImSumExp);
     // cout << ImExp.real() << ',' << ImExp.imag();
 
-    //3.
-    //sign of the permutation given by PermNumber
+// ====================================================================================================================================
+// 3) Sign of the permutation given by PermNumber
+// ====================================================================================================================================
+
     int SPV = _PermSigns.at(PermNumber); // + or - 1 (Parity)
     Complex SignValue(SPV, 0);
 
-    //4.
-    //Finally, we can calculate 1 element of "big" sum apearing in the wave function
+// ====================================================================================================================================
+// 4) Finally, we can calculate one element of "big" sum apearing in the wave function
+// ====================================================================================================================================
+
     Complex ProductElement;
     ProductElement = SignValue * ImExp * prod;
+
 /*
     cout <<'('<<ProductElement.real()<<','<<ProductElement.imag()<<')' ;
     cout <<'('<<SignValue.real()<<','<<SignValue.imag()<<')' ;
@@ -138,10 +150,10 @@ std::complex<double> permutator::sProduct(int n, int PermNumber, double c, vecto
 
 std::complex<double> permutator::WaveFunction(int n, double c, vector<double> X, vector<double> K)
 {
-    //N! calculation which we need to know how many permutations we will have
+    // N! calculation - we need to know how many permutations we will have
     //*************************************************************************
-            int Nfact = 1; //Nfact = N! (Nfactorial)
-            for (int i = 2; i <= n; i++) //Nfactorial value (N!) calculation
+            int Nfact = 1; // Nfact = N! (Nfactorial)
+            for (int i = 2; i <= n; i++) // Nfactorial value (N!) calculation
             { Nfact = Nfact * i; }
             //cout << Nfact;
     // Actually, it is the number of rows of "perms"
@@ -160,9 +172,9 @@ std::complex<double> permutator::WaveFunction(int n, double c, vector<double> X,
         re=wavefunction.real();
         im=wavefunction.imag();
     }
-    Complex wavefunction(re,im);
+    Complex Wavefunction(re,im);
 
-    //Normalization factor
+    // Normalization factor
 
     double norm = Nfact;
     for (int j = 0; j < n ; j++)
@@ -174,21 +186,27 @@ std::complex<double> permutator::WaveFunction(int n, double c, vector<double> X,
     }
 
     Complex Norm( 1./(sqrt( norm)),0 ) ;
-    wavefunction = Norm * wavefunction;
-   // cout << abs(wavefunction) <<  "\n";
+    Wavefunction = Norm * Wavefunction;
+    //cout << fabs(wavefunction) <<  "\n";
 
     //cout << wavefunction.real() << ',' << wavefunction.imag();
 
     //wavefunction = (wavefunction.real())*(wavefunction.real()) + ( wavefunction.imag())*( wavefunction.imag()) ;
-    return wavefunction;
+    return Wavefunction;
 }
 
-//*******************************************************************************************************************
-//*******************************************************************************************************************
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
-//COLLECTIONS OF PARTICLE POSITIONS GENERATION
-//*******************************************************************************************************************
-//*******************************************************************************************************************
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+//*********************************** COLLECTIONS OF PARTICLE POSITIONS GENERATION ***************************************************
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
 double permutator::GetRandom(double min, double max)
 {// Returns a random double between min and max
@@ -212,7 +230,6 @@ void permutator::Positions(vector<double> X0, vector<double> &X1, double delta, 
             X1[n] =  X0.at(n) + posX;
             }
         }
-
     //cout << X1;
 }
 
@@ -235,8 +252,8 @@ void permutator::Metropolis(int N,double c, vector<vector<double> > &Chain, vect
     {
         Positions(X0, X1, delta, i, L);
     }
-        wf0 =  pow (abs(WaveFunction(N,c, X0, K) ), 2.);
-        wf1 =  pow (abs(WaveFunction(N,c, X1, K) ), 2.);
+        wf0 =  pow (fabs(WaveFunction(N,c, X0, K) ), 2.);
+        wf1 =  pow (fabs(WaveFunction(N,c, X1, K) ), 2.);
 
         ratio = wf1/wf0;
 
@@ -260,7 +277,6 @@ void permutator::Metropolis(int N,double c, vector<vector<double> > &Chain, vect
                 }
         }
      X0 = X1;
-
 }
 
 
@@ -282,80 +298,104 @@ int permutator::MaximumPosition(vector<double> WaveFValues)
     return i;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
-// Finding the minimum of "the last" probability density
-// we need to find a jump(s) of the phase of wave function
-//*******************************************************************************************************************
-//*******************************************************************************************************************
+
+
+
+
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
+//***************************** FINDING THE MINIMUM OF "THE LAST" PROBABILITY DENSITY ************************************************
+//**************************** WE NEED TO FIND A JUMP(S) OF THE PHASE OF WAVE FUNCTION ***********************************************
+//------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------
 
 vector<double> permutator::PhaseCalculation(std::complex<double> WF)
-{// gives a vector (abs(Wavefunction), Phase), value of Wave Function is needed to find appropriate jump
+{// gives a vector (fabs(Wavefunction), Phase), value of Wave Function is needed to find appropriate jump
+ // we can use collected values to plot Prob density and phase distribution
 
-    double PI_Value = 3.14159265358979323846;
-    double  WF_re, WF_im, Phase;
+    double  Phase;
     vector<double> Out;
-    WF_re = WF.real();
-    WF_im = WF.imag();
 
-    if( WF_re > 0){
-        if( WF_im > 0 )
-        {
-            Phase = atan( WF_im/WF_re );
-        }
-        else{// means WF_re > 0, WF_im <0
-            Phase = PI_Value - atan( abs( WF_im/WF_re ) );
-        }
-    }
-    else{// means WF_re < 0
-        if( WF_im > 0 )
-        {
-            Phase = 2.*PI_Value - atan( abs( WF_im/WF_re ) );
-        }
-        else{// means WF_re < 0, WF_im < 0
-            Phase = PI_Value + atan( abs( WF_im/WF_re ) );
-        }
-    }
+    Phase = arg ( WF );
 
-    Out.push_back( abs(WF) );
-    Out.push_back( Phase );
+    Out.push_back( pow ( pow(10., - 150.) * fabs (WF), 2 ) ); // Prob density value
+    Out.push_back( Phase ); // Phase value
 
     return Out;
 }
 
 
-void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, int ChainElement, double JumpRestriction ,double c, double L, vector<vector<double> > Chain, vector<double> K)
+
+
+void permutator::MinimaFinder(vector<double> &Minima, vector<vector<double>> &PhaseMatrix, vector<vector<double>> &WFMatrix, int NumOfBisections, int InitialDivision, int n, int ChainElement, double JumpRestriction ,double c, double L, vector<vector<double> > Chain, vector<double> K)
 {
-    vector<double>  PosX = Chain.at(ChainElement); //Positions from the ChainElement of Chain
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The MininaFinder function find the value of proper minimum of prob density based on the phase jump and value of prob
+density in the point corresponding to the phase discontinuity. We know that the jump phase shouldn't be bigger than Pi :)
+
+    Finding the values of phase and prob density in the InitialDivision number of points we can find an interesting
+bracket. After that we use the bisection method. Phase and Prob density plot points obtained during initial calculation
+may be used to prepare plots - so we can kill two birds with one stone.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+
+// ======================================================================================================================
+// 1) Calculation of the Phase and Prob density values in initial points
+// ======================================================================================================================
+
+    vector<double>  PosX = Chain.at(ChainElement); // Choosing the collection of positions from the Chain (  .at(ChainElement)  )
     vector<double>  InitialPositions, PhaseValues, WFValues, temp;
     double  Phase, WF;
 
 //Preparation of initial set of points (0,L*1/(InitialDiv-1),...,L)
+
     for(int i = 0; i < InitialDivision; i++)
     {
         InitialPositions.push_back( i*L/(InitialDivision - 1) );
     }
 
-//Phase and abs of Wave Function in all the points from initial set
+//Values of Phase and fabs(Wave Function)^2 in all the points from initial set
+
     for(int i = 0; i < InitialDivision; i++)
     {
         PosX.at(0) = InitialPositions.at(i);
         temp = PhaseCalculation(WaveFunction(n, c, PosX, K) );
+
         Phase = temp.at(1);
         WF = temp.at(0);
-        PhaseValues.push_back( Phase );
-        WFValues.push_back( WF );
 
-        cout << i << "   " << PhaseValues.at(i) << "   " << WFValues.at(i) <<"\n";
+        PhaseValues.push_back( Phase ); // Set of Phase values in initial points
+        WFValues.push_back( WF );       // Set of Prob denisty values in initial points
+
+       // cout << i << "   " << PhaseValues.at(i) << "   " << WFValues.at(i) <<"\n";
     }
 
-//Jump searching
+//Now we want to append values of Phase and Prob density to matrices
+
+
+    AddCollection(PhaseMatrix, PhaseValues);
+    AddCollection(WFMatrix, WFValues);
+
+
+// ======================================================================================================================
+// 2) Proper value of the Phase Jump searching
+// ======================================================================================================================
+
+//Calculation of diferences between all 2 phase values: fabs( Phase(j+1)-Phase(j) ); and finding JUMPS!
+
     vector<double> JumpValue;
     vector<int> JumpPositions, JumpPositions2;
     double diff;
 
     for(int i = 0; i < InitialDivision-1; i++)
     {
-        diff = sqrt( pow ( PhaseValues.at(i+1) - PhaseValues.at(i), 2) );
+        //cout << PhaseValues.at(i+1) << "   " << PhaseValues.at(i) <<  "   " <<   PhaseValues.at(i + 1) - PhaseValues.at( i )  <<"\n";
+        diff =  fabs ( PhaseValues.at(i + 1) - PhaseValues.at( i ) );
         JumpValue.push_back( diff );
 
         if( diff >= JumpRestriction)
@@ -363,7 +403,6 @@ void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, in
             JumpPositions.push_back(i);
         }
     }
-
 
 /*
     cout << "\n" << "-----1------" << "\n";
@@ -374,14 +413,16 @@ void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, in
     }
 */
 
+
+//We need to find the smallest value of Prob density in the set of points around the JUMPS
+
     int s, p;
-    for(int j = 0; j < JumpPositions.size(); j++)
+    for(unsigned int j = 0; j < JumpPositions.size(); j++)
     {
         s = JumpPositions.at(j);
         JumpPositions2.push_back(s);
         JumpPositions2.push_back(s+1);
     }
-
 
 /*
     cout << "-----2------" << "\n";
@@ -390,6 +431,10 @@ void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, in
         cout << JumpPositions2.at(i) << "\n";
     }
 */
+
+
+    // p is the number of element corresponding to minimal value
+    // of wave function inside the bracket corresponding to the jump of phase
 
     p = JumpPositions2.at(0);
     for(int j = 1; j < JumpPositions2.size(); j++)
@@ -402,16 +447,103 @@ void permutator::PhaseJump(vector<double> &Jumps, int InitialDivision, int n, in
             p = s;
         }
     }
-    cout << "\n" << "============" << "\n";
-    cout << p << "\n";
+    //cout << "\n" << "============" << "\n";
+    //cout << p << "\n";
 
-    Jumps = JumpValue;
 
+// ======================================================================================================================
+// 3) Last step - BISECTION METHOD
+// ======================================================================================================================
+
+// (A=p-1,B=p,C=p+1) st. f(A)>f(B),f(C)>f(B) - bisection method
+
+    double A,B,C,D,E;
+    int pa, pb = p, pc; // number of collection element corresponding to position A/B/C
+
+    if ( p > 0 )
+    {
+        A = InitialPositions.at(p-1);
+        pa = p - 1;
+        if ( p < InitialDivision-1 )
+            {
+                C = InitialPositions.at(p+1);
+                pc = p + 1;
+            }
+            else //Means p = InitialDivision-1
+            {
+                C = InitialPositions.at(0);
+                pc = 0;
+            }
+    }else//Means p = 0
+    {
+        A = InitialPositions.at(InitialDivision-1);
+        pa = InitialDivision - 1;
+        C = InitialPositions.at(p+1);
+        pc = p + 1;
+    }
+    B = InitialPositions.at(p);
+
+
+    double WFa, WFb, WFc, WFd, WFe;// Values of Wave function in new points A/B/C
+    WFa = WFValues.at(pa);
+    WFb = WFValues.at(pb);
+    WFc = WFValues.at(pc);
+    D = (A+B)*0.5;
+    E = (B+C)*0.5;
+    PosX.at(0) = D;
+    WFd = fabs ( WaveFunction(n, c, PosX, K) );
+    PosX.at(0) = E;
+    WFe = fabs ( WaveFunction(n, c, PosX, K) );
+
+
+
+for (int y = 0; y < NumOfBisections; y++)
+{
+
+//--------------- "D" ---------------
+//    if ( WFd <= WFa ) // means f(D) <= f(A)
+  //  {
+        if ( WFd >= WFb  ) // means f(D) <= f(A), f(D) >= f(B), f(C) > f(B)
+        {// new bracket (A=D, B, C)
+            WFa = WFd;
+            A = D;
+        }
+        else// means f(D) <= f(A), f(D) < f(B), f(C) > f(B)
+        {// new bracket (A, B=D, C=B)
+            WFc = WFb;
+            WFb = WFd;
+            C = B;
+            B = D;
+        }
+    //}
+
+//--------------- "E" ---------------
+    //if ( WFe <= WFc ) // means f(E) <= f(C)
+    //{
+        if ( WFe >= WFb  ) // means f(E) <= f(C), f(E) >= f(B), f(A) > f(B)
+        {// new bracket (A, B, C=E)
+            WFc = WFe;
+            C = E;
+        }
+        else// means f(E) <= f(C), f(E) < f(B), f(C) > f(B)
+        {// new bracket (A=B, B=E, C)
+            WFa = WFb;
+            WFb = WFe;
+            A = B;
+            B = E;
+        }
+    //}
+    D = (A+B)*0.5;
+    E = (B+C)*0.5;
+    PosX.at(0) = D;
+    WFd = fabs ( WaveFunction(n, c, PosX, K) );
+    PosX.at(0) = E;
+    WFe = fabs ( WaveFunction(n, c, PosX, K) );
+}
+  //  cout << "\n" << B << "   " << WFb << "\n";
+    Minima.push_back( B );
 
 }
-
-
-
 
 
 
