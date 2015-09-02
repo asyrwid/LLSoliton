@@ -397,12 +397,12 @@ permutator _Permutator;
     #pragma omp for
     for(Par_i1 = 0; Par_i1 < NumOfQuasimomentaSets; Par_i1++)
     {
-        K1 = K_Matrix.at(Par_i1);
-        Par_norm1 = Norms.at(Par_i1);
+        K1 = K_Matrix.at( Par_i1 );
+        Par_norm1 = Norms.at( Par_i1 );
 
         _Permutator.ScalarProduct(K1, K2, AllX, AllWs, AllNorms, c, Measured_X, ScalarProducts_re, ScalarProducts_im, Par_norm1, Par_norm2);
 
-        Parallel_Order.push_back(Par_i1);
+        Parallel_Order.push_back( Par_i1 );
         cout << "\n \n Row number of K_Matrix: " << Par_i1 << ", value of re part: " << ScalarProducts_re.back() << ", par order: " << Parallel_Order.back() << "\n \n";
     }
     // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
