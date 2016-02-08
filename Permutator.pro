@@ -8,12 +8,15 @@ CONFIG -= qt
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    permutator.cpp
+    permutator.cpp \
+    decomposition.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
 
 HEADERS += \
-    permutator.h
+    permutator.h \
+    decomposition.h \
+    utils.h
 
 QMAKE_CXXFLAGS  += -O3
